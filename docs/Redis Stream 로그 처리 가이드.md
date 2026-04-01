@@ -1,5 +1,3 @@
-#Projects/Redis-Study #Stack/Redis
-
 # Redis Stream 로그 처리 가이드
 
 실시간 로그 수집/처리에 Redis Stream을 활용하는 패턴을 정리한다. 실제 프로젝트 도입 시 참고용.
@@ -8,13 +6,13 @@
 
 ## 왜 Redis Stream인가
 
-| | RDB (PostgreSQL) | Redis Stream |
-|---|---|---|
-| 쓰기 속도 | INSERT + 디스크 I/O → 초당 수천 건 | XADD + 메모리 → 초당 수십만 건 |
-| 실시간 소비 | 폴링 필요 (SELECT ... WHERE id > ?) | Consumer Group으로 푸시형 읽기 |
-| 분담 처리 | 직접 구현 필요 | Consumer Group 내장 |
-| 처리 확인 | 직접 구현 필요 | XACK 내장 |
-| 영구 보관 | O | X (메모리 기반, MAXLEN으로 크기 제한) |
+|             | RDB (PostgreSQL)                    | Redis Stream                          |
+| ----------- | ----------------------------------- | ------------------------------------- |
+| 쓰기 속도   | INSERT + 디스크 I/O → 초당 수천 건  | XADD + 메모리 → 초당 수십만 건        |
+| 실시간 소비 | 폴링 필요 (SELECT ... WHERE id > ?) | Consumer Group으로 푸시형 읽기        |
+| 분담 처리   | 직접 구현 필요                      | Consumer Group 내장                   |
+| 처리 확인   | 직접 구현 필요                      | XACK 내장                             |
+| 영구 보관   | O                                   | X (메모리 기반, MAXLEN으로 크기 제한) |
 
 핵심: Redis Stream은 **실시간 버퍼 + 분배기** 역할이지, 영구 저장소가 아니다.
 
@@ -150,12 +148,12 @@ async def consume_activities(redis: Redis, group: str, consumer: str):
 
 ## Kafka vs Redis Stream 간단 비교
 
-| | Redis Stream | Kafka |
-|---|---|---|
-| 설치/운영 | 간단 (Redis에 내장) | 복잡 (ZooKeeper/KRaft + 브로커) |
-| 처리량 | 초당 수십만 건 | 초당 수백만 건 |
-| 메시지 보존 | 메모리 (MAXLEN 제한) | 디스크 (일/주 단위 보존) |
-| 적합 규모 | 중소규모 | 대규모 데이터 파이프라인 |
-| Consumer Group | 지원 | 지원 (더 성숙) |
+|                | Redis Stream         | Kafka                           |
+| -------------- | -------------------- | ------------------------------- |
+| 설치/운영      | 간단 (Redis에 내장)  | 복잡 (ZooKeeper/KRaft + 브로커) |
+| 처리량         | 초당 수십만 건       | 초당 수백만 건                  |
+| 메시지 보존    | 메모리 (MAXLEN 제한) | 디스크 (일/주 단위 보존)        |
+| 적합 규모      | 중소규모             | 대규모 데이터 파이프라인        |
+| Consumer Group | 지원                 | 지원 (더 성숙)                  |
 
 규모가 작~중간이고 이미 Redis를 쓰고 있다면 Stream, 대규모 데이터 파이프라인이면 Kafka.

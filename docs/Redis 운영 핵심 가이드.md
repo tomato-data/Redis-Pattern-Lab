@@ -1,5 +1,3 @@
-#Projects/Redis-Study #Stack/Redis
-
 # Redis 운영 핵심 가이드
 
 프로덕션 환경에서 Redis를 안정적으로 운영하기 위한 핵심 지식을 정리한다.
@@ -18,16 +16,16 @@ Redis에는 테이블이나 스키마가 없다. Key 이름이 곧 데이터 구
 
 ### 네임스페이스 설계 예시
 
-| 도메인 | Key 패턴 | 자료형 | TTL |
-|--------|---------|--------|-----|
-| 캐시 | `cache:user:{user_id}` | String (JSON) | 5분 |
-| 세션 | `session:{session_id}` | Hash | 30분 |
-| 장바구니 | `cart:{user_id}` | Hash | 24시간 |
-| 실시간 랭킹 | `rank:daily:{date}` | Sorted Set | 48시간 |
-| 최근 본 상품 | `recent:{user_id}` | List | 7일 |
-| Rate Limit | `ratelimit:{user_id}:{endpoint}` | String (INCR) | 1분 |
-| 분산 락 | `lock:{resource}` | String (NX) | 10초 |
-| 인증번호 | `otp:{phone}` | String | 3분 |
+| 도메인       | Key 패턴                         | 자료형        | TTL    |
+| ------------ | -------------------------------- | ------------- | ------ |
+| 캐시         | `cache:user:{user_id}`           | String (JSON) | 5분    |
+| 세션         | `session:{session_id}`           | Hash          | 30분   |
+| 장바구니     | `cart:{user_id}`                 | Hash          | 24시간 |
+| 실시간 랭킹  | `rank:daily:{date}`              | Sorted Set    | 48시간 |
+| 최근 본 상품 | `recent:{user_id}`               | List          | 7일    |
+| Rate Limit   | `ratelimit:{user_id}:{endpoint}` | String (INCR) | 1분    |
+| 분산 락      | `lock:{resource}`                | String (NX)   | 10초   |
+| 인증번호     | `otp:{phone}`                    | String        | 3분    |
 
 ### 안티패턴
 
@@ -44,7 +42,7 @@ SET user{1234} '...'
 
 ---
 
-## 2. KEYS * 금지 — SCAN으로 대체
+## 2. KEYS \* 금지 — SCAN으로 대체
 
 ### 왜 위험한가
 
@@ -78,11 +76,11 @@ SCAN 22 MATCH user:* COUNT 55
 
 ### 자료구조별 SCAN 변형
 
-| 명령어 | 대상 |
-|--------|------|
-| `SCAN` | 전체 키 |
-| `HSCAN` | Hash 필드 |
-| `SSCAN` | Set 멤버 |
+| 명령어  | 대상            |
+| ------- | --------------- |
+| `SCAN`  | 전체 키         |
+| `HSCAN` | Hash 필드       |
+| `SSCAN` | Set 멤버        |
 | `ZSCAN` | Sorted Set 멤버 |
 
 ---
@@ -98,11 +96,11 @@ maxmemory-policy: allkeys-lru
 
 ### Eviction 정책 (실무에서 주로 쓰는 3가지)
 
-| 정책 | 동작 | 사용처 |
-|------|------|--------|
-| **noeviction** | 메모리 가득 차면 쓰기 거부 (에러) | 데이터 유실 절대 불가 |
-| **allkeys-lru** | 모든 키 중 가장 오래 안 쓴 것 삭제 | **캐시 서버 (가장 일반적)** |
-| **volatile-lru** | TTL 설정된 키 중에서만 LRU 삭제 | 캐시 + 영구 데이터 혼용 |
+| 정책             | 동작                               | 사용처                      |
+| ---------------- | ---------------------------------- | --------------------------- |
+| **noeviction**   | 메모리 가득 차면 쓰기 거부 (에러)  | 데이터 유실 절대 불가       |
+| **allkeys-lru**  | 모든 키 중 가장 오래 안 쓴 것 삭제 | **캐시 서버 (가장 일반적)** |
+| **volatile-lru** | TTL 설정된 키 중에서만 LRU 삭제    | 캐시 + 영구 데이터 혼용     |
 
 LRU = Least Recently Used (가장 오래 사용되지 않은 것)
 
@@ -112,11 +110,11 @@ LRU = Least Recently Used (가장 오래 사용되지 않은 것)
 redis-cli INFO memory
 ```
 
-| 항목 | 의미 |
-|------|------|
-| used_memory | Redis가 실제 사용 중인 메모리 |
+| 항목            | 의미                            |
+| --------------- | ------------------------------- |
+| used_memory     | Redis가 실제 사용 중인 메모리   |
 | used_memory_rss | OS가 Redis에 할당한 실제 메모리 |
-| maxmemory | 한도 |
+| maxmemory       | 한도                            |
 
 used_memory_rss가 used_memory보다 큰 이유: OS의 메모리 할당 방식(페이지 단위) + 메모리 단편화.
 
@@ -151,11 +149,11 @@ appendonly: yes
 appendfsync: everysec
 ```
 
-| appendfsync 옵션 | 동작 | 데이터 유실 | 성능 |
-|-----------------|------|-----------|------|
-| **always** | 매 명령마다 디스크 기록 | 거의 0 | 느림 |
-| **everysec** | 1초마다 기록 | 최대 1초분 | **균형 (권장)** |
-| **no** | OS에 맡김 | 수십 초분 | 빠름 |
+| appendfsync 옵션 | 동작                    | 데이터 유실 | 성능            |
+| ---------------- | ----------------------- | ----------- | --------------- |
+| **always**       | 매 명령마다 디스크 기록 | 거의 0      | 느림            |
+| **everysec**     | 1초마다 기록            | 최대 1초분  | **균형 (권장)** |
+| **no**           | OS에 맡김               | 수십 초분   | 빠름            |
 
 현재 `everysec`이므로 서버가 갑자기 죽어도 최대 1초치 데이터만 유실된다.
 
