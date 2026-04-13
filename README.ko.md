@@ -7,7 +7,7 @@
 ## Highlights
 
 - **12개 실습 패턴** — 캐싱, 세션, 카운터, 분산 락, Rate Limiting, 랭킹, Pub/Sub, Stream까지
-- **AI 활용 구조적 학습** — Claude로 [학습 로드맵](roadmap/) 설계, 프로젝트 프레임워크 구축, [심화 문서](docs/) 작성
+- **AI 활용 구조적 학습** — Claude가 [Phase 스펙과 마스터 로드맵](docs/phases/)을 설계, 프로젝트 골격 구축, 내가 직접 [심화 주제와 Q&A](learnings/)를 작성
 - **한 줄로 실행** — `docker compose up`으로 Redis 7.2 + RedisInsight + FastAPI 즉시 구동
 - **벤치마크 기반 인사이트** — 모든 패턴에 Redis vs SQLite 성능 비교 데이터 포함
 
@@ -24,18 +24,18 @@
 ## 학습 방식
 
 ```
-1. AI가 구조적 학습 로드맵 생성 (roadmap/)
+1. AI가 Phase 스펙 + 마스터 로드맵 생성 (docs/phases/)
        ↓
 2. AI가 프로젝트 골격 + Docker 환경 구축
        ↓
 3. 패턴별 직접 구현, 실행, 결과 관찰
        ↓
-4. 학습 내용을 AI와 함께 심화 문서로 정리 (docs/)
+4. 진행하며 Q&A와 심화 주제를 직접 기록 (learnings/)
        ↓
 5. 검토하고, 질문하고, 개념이 확실해질 때까지 반복
 ```
 
-> 코드는 내가 작성하고, AI는 튜터. [학습 로드맵](roadmap/)과 [학습 노트](docs/) 전문 참조.
+> 코드는 내가 작성하고, AI는 튜터. Phase 스펙은 [`docs/phases/`](docs/phases/)에, Q&A와 심화 노트는 [`learnings/`](learnings/)에 있다.
 
 ---
 
@@ -107,21 +107,24 @@ Redis-Pattern-Lab/
 │       ├── step11_stream.py    # Stream + Consumer Group
 │       └── step12_comparison.py # Redis vs SQLite 벤치마크
 │
-├── docs/                       # 심화 학습 노트
-│   ├── Redis guide.md
-│   ├── Redis 명령어 체계.md      # 명령어 분류 체계
-│   ├── Redis 운영 핵심 가이드.md   # 운영 가이드
-│   ├── Redis QnA 모음.md        # 학습 중 정리한 Q&A 15선
-│   ├── 캐시 무효화와 Stampede 방어.md  # 캐시 무효화 전략
-│   ├── SET NX XX 옵션.md        # 락 프리미티브
-│   ├── Redis Stream 로그 처리 가이드.md  # Stream 아키텍처
-│   ├── Sorted Set vs RDB 랭킹.md  # Skip List vs B-Tree
-│   ├── 실습 결과.md              # 전 패턴 실행 결과 기록
-│   └── Redis 라이선스와 오픈소스 선택.md  # 라이선스 분석
+├── docs/                       # Claude가 쓴 스펙 (docs/README.md 참조)
+│   ├── README.md               # Phase 인덱스
+│   ├── phases/                 # phase01~08 + 마스터 로드맵
+│   └── plans/                  # /tdd-plan 결과물
 │
-├── roadmap/                    # AI 생성 학습 커리큘럼
-│   ├── Redis 마스터 로드맵.md     # 마스터 로드맵 (42개 주제, 약 10시간)
-│   └── Section 1-8             # 섹션별 상세 노트
+├── learnings/                  # 사용자 산출물 (learnings/README.md 참조)
+│   ├── README.md               # Phase 맵 + 토픽 인덱스
+│   ├── qna/                    # Phase Q&A (현재는 cross-cutting.md 통합)
+│   ├── retrospectives/         # Phase별 회고
+│   └── topics/                 # 크로스커팅 심화 주제
+│       ├── redis-명령어-체계.md
+│       ├── redis-운영-핵심-가이드.md
+│       ├── redis-stream-로그-처리.md
+│       ├── set-nx-xx-옵션.md
+│       ├── 캐시-무효화와-stampede-방어.md
+│       ├── sorted-set-vs-rdb-랭킹.md
+│       ├── redis-라이선스와-오픈소스-선택.md
+│       └── 실습-결과.md
 │
 ├── docker-compose.yml          # Redis + RedisInsight + FastAPI
 ├── Dockerfile
@@ -132,18 +135,19 @@ Redis-Pattern-Lab/
 
 ## 학습 문서
 
-각 패턴을 구현하며 작성한 심화 학습 노트:
+문서는 **작성 주체**에 따라 분리되어 있습니다. Phase 스펙은 [`docs/`](docs/README.md)(Claude 작성), Q&A·회고·크로스커팅 심화는 [`learnings/`](learnings/README.md)(사용자 작성)에 있습니다.
 
 | 문서 | 주제 |
 |------|------|
-| [명령어 분류 체계](docs/Redis%20명령어%20체계.md) | 접두어 체계 (L/S/H/Z/X), 네이밍 규칙 |
-| [운영 핵심 가이드](docs/Redis%20운영%20핵심%20가이드.md) | 키 네이밍, SCAN vs KEYS, 메모리 정책, 모니터링 |
-| [캐시 무효화 전략](docs/캐시%20무효화와%20Stampede%20방어.md) | TTL / Write-Through / Write-Behind / 이벤트 기반 |
-| [Q&A 모음](docs/Redis%20QnA%20모음.md) | 학습 중 정리한 15개 질문과 답 |
-| [Stream 아키텍처](docs/Redis%20Stream%20로그%20처리%20가이드.md) | Producer → Stream → Consumer Group 파이프라인 |
-| [Sorted Set vs RDB](docs/Sorted%20Set%20vs%20RDB%20랭킹.md) | Skip List O(log N) vs ORDER BY O(N log N) |
-| [실습 결과 기록](docs/실습%20결과.md) | 전 패턴 실제 실행 결과 |
-| [라이선스 분석](docs/Redis%20라이선스와%20오픈소스%20선택.md) | RSALv2 + SSPL 영향 분석 |
+| [명령어 분류 체계](learnings/topics/redis-명령어-체계.md) | 접두어 체계 (L/S/H/Z/X), 네이밍 규칙 |
+| [운영 핵심 가이드](learnings/topics/redis-운영-핵심-가이드.md) | 키 네이밍, SCAN vs KEYS, 메모리 정책, 모니터링 |
+| [캐시 무효화 전략](learnings/topics/캐시-무효화와-stampede-방어.md) | TTL / Write-Through / Write-Behind / 이벤트 기반 |
+| [Q&A 모음](learnings/qna/cross-cutting.md) | 학습 중 정리한 질문과 답 |
+| [Stream 아키텍처](learnings/topics/redis-stream-로그-처리.md) | Producer → Stream → Consumer Group 파이프라인 |
+| [Sorted Set vs RDB](learnings/topics/sorted-set-vs-rdb-랭킹.md) | Skip List O(log N) vs ORDER BY O(N log N) |
+| [실습 결과 기록](learnings/topics/실습-결과.md) | 전 패턴 실제 실행 결과 |
+| [SET NX/XX 옵션](learnings/topics/set-nx-xx-옵션.md) | 락 프리미티브 의미 |
+| [라이선스 분석](learnings/topics/redis-라이선스와-오픈소스-선택.md) | RSALv2 + SSPL 영향 분석 |
 
 ---
 

@@ -7,7 +7,7 @@
 ## Highlights
 
 - **12 hands-on patterns** covering caching, sessions, counters, locks, rate limiting, ranking, Pub/Sub, and Streams
-- **AI-assisted structured learning** — Claude generated the [study roadmap](roadmap/), scaffolded the project framework, and produced [deep-dive documentation](docs/)
+- **AI-assisted structured learning** — Claude generated the [phase specs and master roadmap](docs/phases/), scaffolded the project framework, and I documented every [deep-dive topic and Q&A](learnings/) as I built
 - **Runnable in one command** — `docker compose up` spins up Redis 7.2, RedisInsight, and the FastAPI app
 - **Benchmark-backed insights** — every pattern includes Redis vs SQLite performance comparisons with real numbers
 
@@ -24,18 +24,18 @@ Instead of reading docs passively, I used Claude to design a structured curricul
 ## How I Study
 
 ```
-1. AI generates a structured roadmap (roadmap/)
+1. AI generates phase specs + a master roadmap (docs/phases/)
        ↓
 2. AI scaffolds the project skeleton + Docker environment
        ↓
 3. I implement each pattern, run it, and observe the results
        ↓
-4. AI helps me write deep-dive docs from what I learned (docs/)
+4. I document Q&A and deep-dive topics as I go (learnings/)
        ↓
 5. I review, question, and refine until the concept sticks
 ```
 
-> The code is mine; AI is the tutor. See the full [Learning Roadmap](roadmap/) and [Study Notes](docs/).
+> The code is mine; AI is the tutor. See [`docs/phases/`](docs/phases/) for phase specs and [`learnings/`](learnings/) for Q&A and topic deep-dives.
 
 ---
 
@@ -107,21 +107,24 @@ Redis-Pattern-Lab/
 │       ├── step11_stream.py    # Stream + Consumer Group
 │       └── step12_comparison.py # Redis vs SQLite benchmark
 │
-├── docs/                       # Deep-dive study notes
-│   ├── Redis guide.md
-│   ├── Redis 명령어 체계.md      # Command taxonomy
-│   ├── Redis 운영 핵심 가이드.md   # Operations guide
-│   ├── Redis QnA 모음.md        # 15 Q&A from studying
-│   ├── 캐시 무효화와 Stampede 방어.md  # Cache invalidation strategies
-│   ├── SET NX XX 옵션.md        # Lock primitives
-│   ├── Redis Stream 로그 처리 가이드.md  # Stream architecture
-│   ├── Sorted Set vs RDB 랭킹.md  # Skip List vs B-Tree
-│   ├── 실습 결과.md              # Lab results with real data
-│   └── Redis 라이선스와 오픈소스 선택.md  # License analysis
+├── docs/                       # Claude-authored specs (see docs/README.md)
+│   ├── README.md               # Phase index
+│   ├── phases/                 # phase01~08 + master roadmap
+│   └── plans/                  # /tdd-plan outputs
 │
-├── roadmap/                    # AI-generated learning curriculum
-│   ├── Redis 마스터 로드맵.md     # Master roadmap (42 topics, ~10h)
-│   └── Section 1-8             # Detailed notes per section
+├── learnings/                  # User-authored notes (see learnings/README.md)
+│   ├── README.md               # Phase map + topic index
+│   ├── qna/                    # Phase Q&A (currently integrated in cross-cutting.md)
+│   ├── retrospectives/         # Per-phase retrospectives
+│   └── topics/                 # Cross-cutting deep-dives
+│       ├── redis-명령어-체계.md
+│       ├── redis-운영-핵심-가이드.md
+│       ├── redis-stream-로그-처리.md
+│       ├── set-nx-xx-옵션.md
+│       ├── 캐시-무효화와-stampede-방어.md
+│       ├── sorted-set-vs-rdb-랭킹.md
+│       ├── redis-라이선스와-오픈소스-선택.md
+│       └── 실습-결과.md
 │
 ├── docker-compose.yml          # Redis + RedisInsight + FastAPI
 ├── Dockerfile
@@ -132,18 +135,19 @@ Redis-Pattern-Lab/
 
 ## Documentation
 
-Study notes produced while implementing each pattern:
+Study notes are split by authorship. Phase specs live in [`docs/`](docs/README.md) (Claude-written); my own Q&A, retrospectives, and topic deep-dives live in [`learnings/`](learnings/README.md).
 
 | Document | Topic |
 |----------|-------|
-| [Command Taxonomy](docs/Redis%20명령어%20체계.md) | Prefix system (L/S/H/Z/X), naming conventions |
-| [Operations Guide](docs/Redis%20운영%20핵심%20가이드.md) | Key naming, SCAN vs KEYS, memory policy, monitoring |
-| [Cache Invalidation](docs/캐시%20무효화와%20Stampede%20방어.md) | TTL / Write-Through / Write-Behind / Event-based strategies |
-| [Q&A Collection](docs/Redis%20QnA%20모음.md) | 15 questions answered while studying |
-| [Stream Architecture](docs/Redis%20Stream%20로그%20처리%20가이드.md) | Producer → Stream → Consumer Group pipeline |
-| [Sorted Set vs RDB](docs/Sorted%20Set%20vs%20RDB%20랭킹.md) | Skip List O(log N) vs ORDER BY O(N log N) |
-| [Lab Results](docs/실습%20결과.md) | Actual output from every pattern |
-| [License Analysis](docs/Redis%20라이선스와%20오픈소스%20선택.md) | RSALv2 + SSPL impact assessment |
+| [Command Taxonomy](learnings/topics/redis-명령어-체계.md) | Prefix system (L/S/H/Z/X), naming conventions |
+| [Operations Guide](learnings/topics/redis-운영-핵심-가이드.md) | Key naming, SCAN vs KEYS, memory policy, monitoring |
+| [Cache Invalidation](learnings/topics/캐시-무효화와-stampede-방어.md) | TTL / Write-Through / Write-Behind / Event-based strategies |
+| [Q&A Collection](learnings/qna/cross-cutting.md) | Questions answered while studying |
+| [Stream Architecture](learnings/topics/redis-stream-로그-처리.md) | Producer → Stream → Consumer Group pipeline |
+| [Sorted Set vs RDB](learnings/topics/sorted-set-vs-rdb-랭킹.md) | Skip List O(log N) vs ORDER BY O(N log N) |
+| [Lab Results](learnings/topics/실습-결과.md) | Actual output from every pattern |
+| [SET NX/XX Options](learnings/topics/set-nx-xx-옵션.md) | Lock primitive semantics |
+| [License Analysis](learnings/topics/redis-라이선스와-오픈소스-선택.md) | RSALv2 + SSPL impact assessment |
 
 ---
 
