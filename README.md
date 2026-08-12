@@ -1,122 +1,122 @@
 # Redis Pattern Lab
 
-[![Korean](https://img.shields.io/badge/lang-Korean-blue)](README.ko.md)
+[![English](https://img.shields.io/badge/lang-English-blue)](README.en.md)
 
-> **12 production Redis patterns** implemented in FastAPI — from cache-aside to distributed locks, learned by building.
+> **12개 실무 Redis 패턴**을 FastAPI로 직접 구현 — 캐시부터 분산 락까지, 만들면서 배우기.
 
 ## Highlights
 
-- **12 hands-on patterns** covering caching, sessions, counters, locks, rate limiting, ranking, Pub/Sub, and Streams
-- **AI-assisted structured learning** — Claude generated the [phase specs and master roadmap](docs/phases/), scaffolded the project framework, and I documented every [deep-dive topic and Q&A](learnings/) as I built
-- **Runnable in one command** — `docker compose up` spins up Redis 7.2, RedisInsight, and the FastAPI app
-- **Benchmark-backed insights** — every pattern includes Redis vs SQLite performance comparisons with real numbers
+- **12개 실습 패턴** — 캐싱, 세션, 카운터, 분산 락, Rate Limiting, 랭킹, Pub/Sub, Stream까지
+- **AI 활용 구조적 학습** — Claude가 [Phase 스펙과 마스터 로드맵](docs/phases/)을 설계, 프로젝트 골격 구축, 내가 직접 [심화 주제와 Q&A](learnings/)를 작성
+- **한 줄로 실행** — `docker compose up`으로 Redis 7.2 + RedisInsight + FastAPI 즉시 구동
+- **벤치마크 기반 인사이트** — 모든 패턴에 Redis vs SQLite 성능 비교 데이터 포함
 
 ---
 
-## Why I Built This
+## 왜 만들었나
 
-I introduced Redis at work for caching and session management, but realized my understanding was surface-level — I knew *how* to call `SET` and `GET`, but not *why* Redis uses single-threaded I/O multiplexing, when Sorted Sets beat SQL `ORDER BY`, or how to prevent cache stampedes.
+실무에서 Redis를 캐싱과 세션 관리에 도입해서 사용하고 있었지만, 이해가 피상적이라는 걸 깨달았습니다. `SET`과 `GET`을 호출하는 방법은 알지만, Redis가 왜 싱글 스레드 I/O 멀티플렉싱을 쓰는지, Sorted Set이 언제 SQL `ORDER BY`를 이기는지, 캐시 스탬피드를 어떻게 방지하는지는 몰랐습니다.
 
-Instead of reading docs passively, I used Claude to design a structured curriculum and build a hands-on lab where I implement each pattern myself, run it, and compare the results against a relational database.
+문서를 수동적으로 읽는 대신, Claude를 활용해 구조적인 커리큘럼을 설계하고, 각 패턴을 직접 구현하고 실행하고 관계형 DB와 비교하는 실습 환경을 구축했습니다.
 
 ---
 
-## How I Study
+## 학습 방식
 
 ```
-1. AI generates phase specs + a master roadmap (docs/phases/)
+1. AI가 Phase 스펙 + 마스터 로드맵 생성 (docs/phases/)
        ↓
-2. AI scaffolds the project skeleton + Docker environment
+2. AI가 프로젝트 골격 + Docker 환경 구축
        ↓
-3. I implement each pattern, run it, and observe the results
+3. 패턴별 직접 구현, 실행, 결과 관찰
        ↓
-4. I document Q&A and deep-dive topics as I go (learnings/)
+4. 진행하며 Q&A와 심화 주제를 직접 기록 (learnings/)
        ↓
-5. I review, question, and refine until the concept sticks
+5. 검토하고, 질문하고, 개념이 확실해질 때까지 반복
 ```
 
-> The code is mine; AI is the tutor. See [`docs/phases/`](docs/phases/) for phase specs and [`learnings/`](learnings/) for Q&A and topic deep-dives.
+> 코드는 내가 작성하고, AI는 튜터. Phase 스펙은 [`docs/phases/`](docs/phases/)에, Q&A와 심화 노트는 [`learnings/`](learnings/)에 있다.
 
 ---
 
-## 12 Patterns
+## 12개 패턴
 
-| # | Pattern | Data Structure | Real-World Use Case | Key Concept |
-|---|---------|---------------|-------------------|-------------|
-| 01 | [Basic Types](app/routers/step01_basics.py) | String, List, Set, Hash, Sorted Set | Foundation for all patterns | 5 core types, O(1) operations |
-| 02 | [Cache-Aside](app/routers/step02_cache.py) | String (JSON) | Product page caching | TTL + jitter to prevent stampede |
-| 03 | [Recent Items](app/routers/step03_recent.py) | List | "Recently viewed" on e-commerce | LREM → LPUSH → LTRIM pipeline |
-| 04 | [Distributed Session](app/routers/step04_session.py) | Hash | Multi-server auth | Sliding expiration, field-level access |
-| 05 | [Atomic Counter](app/routers/step05_counter.py) | String + Set | View counts, like toggles | INCR atomicity, deduplication via Set |
-| 06 | [OTP Verification](app/routers/step06_verification.py) | String with TTL | Phone/email verification | Auto-expiry, cooldown, attempt limiting |
-| 07 | [Distributed Lock](app/routers/step07_lock.py) | String (NX) + Lua | Coupon stock management | SET NX EX + Lua ownership check |
-| 08 | [Rate Limiting](app/routers/step08_ratelimit.py) | String / Sorted Set | API quota enforcement | Fixed vs sliding window comparison |
-| 09 | [Real-time Ranking](app/routers/step09_ranking.py) | Sorted Set | Game leaderboard | O(log N) vs SQL O(N log N) |
-| 10 | [Pub/Sub](app/routers/step10_pubsub.py) | Channel | Live notifications | Fire-and-forget + SSE streaming |
-| 11 | [Stream](app/routers/step11_stream.py) | Stream | Event sourcing, task queues | Consumer Group + XACK acknowledgment |
-| 12 | [Benchmark](app/routers/step12_comparison.py) | All | Performance validation | Redis vs SQLite head-to-head |
-
----
-
-## Benchmark Results
-
-| Test | Redis | SQLite | Difference |
-|------|-------|--------|-----------|
-| Single read | 0.137 ms | 0.843 ms | **6.1x** |
-| 100 batch reads (avg) | 0.088 ms | 0.284 ms | **3.2x** |
-| 100 counter increments | 6.031 ms | 164.063 ms | **27.2x** |
-| Pipeline vs individual | 0.724 ms | 6.109 ms | **8.4x** |
-| Top 10 ranking | 0.164 ms | 1.094 ms | **6.7x** |
-
-> Writes show the largest gap (27x) — SQLite commits to disk per UPDATE, Redis INCR completes in memory.
-> Even with local SQLite (no network), Redis is consistently 3-27x faster.
+| # | 패턴 | 자료구조 | 실무 사용처 | 핵심 개념 |
+|---|------|---------|-----------|----------|
+| 01 | [기본 자료형](app/routers/step01_basics.py) | String, List, Set, Hash, Sorted Set | 모든 패턴의 기반 | 5가지 핵심 타입, O(1) 연산 |
+| 02 | [Cache-Aside](app/routers/step02_cache.py) | String (JSON) | 상품 페이지 캐싱 | TTL + jitter로 스탬피드 방지 |
+| 03 | [최근 본 항목](app/routers/step03_recent.py) | List | 쇼핑몰 "최근 본 상품" | LREM → LPUSH → LTRIM 파이프라인 |
+| 04 | [분산 세션](app/routers/step04_session.py) | Hash | 멀티 서버 인증 | 슬라이딩 만료, 필드 단위 접근 |
+| 05 | [원자적 카운터](app/routers/step05_counter.py) | String + Set | 조회수, 좋아요 토글 | INCR 원자성, Set으로 중복 방지 |
+| 06 | [OTP 인증](app/routers/step06_verification.py) | String + TTL | 휴대폰/이메일 인증 | 자동 만료, 쿨다운, 시도 횟수 제한 |
+| 07 | [분산 락](app/routers/step07_lock.py) | String (NX) + Lua | 쿠폰 재고 관리 | SET NX EX + Lua 소유권 확인 |
+| 08 | [Rate Limiting](app/routers/step08_ratelimit.py) | String / Sorted Set | API 쿼터 제어 | 고정 vs 슬라이딩 윈도우 비교 |
+| 09 | [실시간 랭킹](app/routers/step09_ranking.py) | Sorted Set | 게임 리더보드 | O(log N) vs SQL O(N log N) |
+| 10 | [Pub/Sub](app/routers/step10_pubsub.py) | Channel | 실시간 알림 | Fire-and-Forget + SSE 스트리밍 |
+| 11 | [Stream](app/routers/step11_stream.py) | Stream | 이벤트 소싱, 작업 큐 | Consumer Group + XACK 확인 응답 |
+| 12 | [벤치마크](app/routers/step12_comparison.py) | 전체 | 성능 검증 | Redis vs SQLite 직접 비교 |
 
 ---
 
-## Tech Stack
+## 벤치마크 결과
 
-| Area | Technology |
-|------|-----------|
-| **App Framework** | FastAPI 0.115 (async) |
-| **Redis Client** | redis-py 5.2 (async) |
-| **Comparison DB** | SQLite + SQLAlchemy 2.0 (async) |
-| **Container** | Docker Compose (Redis 7.2, RedisInsight, FastAPI) |
-| **Language** | Python 3.12 |
+| 테스트 | Redis | SQLite | 차이 |
+|--------|-------|--------|------|
+| 단일 읽기 | 0.137 ms | 0.843 ms | **6.1배** |
+| 100회 반복 읽기 (평균) | 0.088 ms | 0.284 ms | **3.2배** |
+| 카운터 100회 증가 | 6.031 ms | 164.063 ms | **27.2배** |
+| Pipeline vs 개별 | 0.724 ms | 6.109 ms | **8.4배** |
+| Top 10 랭킹 조회 | 0.164 ms | 1.094 ms | **6.7배** |
+
+> 쓰기에서 가장 큰 차이(27배) — SQLite는 UPDATE마다 디스크 커밋, Redis INCR은 메모리에서 완료.
+> 네트워크 없는 로컬 SQLite에서도 Redis가 일관되게 3~27배 빠름.
 
 ---
 
-## Project Structure
+## 기술 스택
+
+| 영역 | 기술 |
+|------|------|
+| **앱 프레임워크** | FastAPI 0.115 (async) |
+| **Redis 클라이언트** | redis-py 5.2 (async) |
+| **비교 DB** | SQLite + SQLAlchemy 2.0 (async) |
+| **컨테이너** | Docker Compose (Redis 7.2, RedisInsight, FastAPI) |
+| **언어** | Python 3.12 |
+
+---
+
+## 프로젝트 구조
 
 ```
 Redis-Pattern-Lab/
 ├── app/
-│   ├── main.py                 # FastAPI app + Redis connection pool
-│   ├── database.py             # SQLite models for comparison
+│   ├── main.py                 # FastAPI 앱 + Redis 커넥션 풀
+│   ├── database.py             # 비교용 SQLite 모델
 │   ├── dependencies.py         # DI (get_redis, get_db)
 │   └── routers/
-│       ├── step01_basics.py    # 5 data types
+│       ├── step01_basics.py    # 5가지 자료형
 │       ├── step02_cache.py     # Cache-Aside + TTL jitter
-│       ├── step03_recent.py    # Recent items (List pipeline)
-│       ├── step04_session.py   # Distributed session (Hash)
-│       ├── step05_counter.py   # Atomic counter (INCR + Set)
-│       ├── step06_verification.py  # OTP with TTL
-│       ├── step07_lock.py      # Distributed lock (Lua)
-│       ├── step08_ratelimit.py # Fixed & sliding window
-│       ├── step09_ranking.py   # Sorted Set leaderboard
+│       ├── step03_recent.py    # 최근 본 항목 (List 파이프라인)
+│       ├── step04_session.py   # 분산 세션 (Hash)
+│       ├── step05_counter.py   # 원자적 카운터 (INCR + Set)
+│       ├── step06_verification.py  # TTL 기반 OTP
+│       ├── step07_lock.py      # 분산 락 (Lua Script)
+│       ├── step08_ratelimit.py # 고정 & 슬라이딩 윈도우
+│       ├── step09_ranking.py   # Sorted Set 리더보드
 │       ├── step10_pubsub.py    # Pub/Sub + SSE
 │       ├── step11_stream.py    # Stream + Consumer Group
-│       └── step12_comparison.py # Redis vs SQLite benchmark
+│       └── step12_comparison.py # Redis vs SQLite 벤치마크
 │
-├── docs/                       # Claude-authored specs (see docs/README.md)
-│   ├── README.md               # Phase index
-│   ├── phases/                 # phase01~08 + master roadmap
-│   └── plans/                  # /tdd-plan outputs
+├── docs/                       # Claude가 쓴 스펙 (docs/README.md 참조)
+│   ├── README.md               # Phase 인덱스
+│   ├── phases/                 # phase01~08 + 마스터 로드맵
+│   └── plans/                  # /tdd-plan 결과물
 │
-├── learnings/                  # User-authored notes (see learnings/README.md)
-│   ├── README.md               # Phase map + topic index
-│   ├── qna/                    # Phase Q&A (currently integrated in cross-cutting.md)
-│   ├── retrospectives/         # Per-phase retrospectives
-│   └── topics/                 # Cross-cutting deep-dives
+├── learnings/                  # 사용자 산출물 (learnings/README.md 참조)
+│   ├── README.md               # Phase 맵 + 토픽 인덱스
+│   ├── qna/                    # Phase Q&A (현재는 cross-cutting.md 통합)
+│   ├── retrospectives/         # Phase별 회고
+│   └── topics/                 # 크로스커팅 심화 주제
 │       ├── redis-명령어-체계.md
 │       ├── redis-운영-핵심-가이드.md
 │       ├── redis-stream-로그-처리.md
@@ -133,25 +133,25 @@ Redis-Pattern-Lab/
 
 ---
 
-## Documentation
+## 학습 문서
 
-Study notes are split by authorship. Phase specs live in [`docs/`](docs/README.md) (Claude-written); my own Q&A, retrospectives, and topic deep-dives live in [`learnings/`](learnings/README.md).
+문서는 **작성 주체**에 따라 분리되어 있습니다. Phase 스펙은 [`docs/`](docs/README.md)(Claude 작성), Q&A·회고·크로스커팅 심화는 [`learnings/`](learnings/README.md)(사용자 작성)에 있습니다.
 
-| Document | Topic |
-|----------|-------|
-| [Command Taxonomy](learnings/topics/redis-명령어-체계.md) | Prefix system (L/S/H/Z/X), naming conventions |
-| [Operations Guide](learnings/topics/redis-운영-핵심-가이드.md) | Key naming, SCAN vs KEYS, memory policy, monitoring |
-| [Cache Invalidation](learnings/topics/캐시-무효화와-stampede-방어.md) | TTL / Write-Through / Write-Behind / Event-based strategies |
-| [Q&A Collection](learnings/qna/cross-cutting.md) | Questions answered while studying |
-| [Stream Architecture](learnings/topics/redis-stream-로그-처리.md) | Producer → Stream → Consumer Group pipeline |
+| 문서 | 주제 |
+|------|------|
+| [명령어 분류 체계](learnings/topics/redis-명령어-체계.md) | 접두어 체계 (L/S/H/Z/X), 네이밍 규칙 |
+| [운영 핵심 가이드](learnings/topics/redis-운영-핵심-가이드.md) | 키 네이밍, SCAN vs KEYS, 메모리 정책, 모니터링 |
+| [캐시 무효화 전략](learnings/topics/캐시-무효화와-stampede-방어.md) | TTL / Write-Through / Write-Behind / 이벤트 기반 |
+| [Q&A 모음](learnings/qna/cross-cutting.md) | 학습 중 정리한 질문과 답 |
+| [Stream 아키텍처](learnings/topics/redis-stream-로그-처리.md) | Producer → Stream → Consumer Group 파이프라인 |
 | [Sorted Set vs RDB](learnings/topics/sorted-set-vs-rdb-랭킹.md) | Skip List O(log N) vs ORDER BY O(N log N) |
-| [Lab Results](learnings/topics/실습-결과.md) | Actual output from every pattern |
-| [SET NX/XX Options](learnings/topics/set-nx-xx-옵션.md) | Lock primitive semantics |
-| [License Analysis](learnings/topics/redis-라이선스와-오픈소스-선택.md) | RSALv2 + SSPL impact assessment |
+| [실습 결과 기록](learnings/topics/실습-결과.md) | 전 패턴 실제 실행 결과 |
+| [SET NX/XX 옵션](learnings/topics/set-nx-xx-옵션.md) | 락 프리미티브 의미 |
+| [라이선스 분석](learnings/topics/redis-라이선스와-오픈소스-선택.md) | RSALv2 + SSPL 영향 분석 |
 
 ---
 
-## Getting Started
+## 시작하기
 
 ```bash
 docker compose up -d
@@ -160,7 +160,7 @@ docker compose up -d
 # RedisInsight: http://localhost:5540
 ```
 
-Each step is a separate API group — open Swagger UI and run the endpoints in order (Step 01 → 12).
+각 스텝은 별도의 API 그룹 — Swagger UI에서 순서대로 실행 (Step 01 → 12).
 
 ---
 
