@@ -23,7 +23,7 @@
 | 07 | _(회고 백필 예정)_ | — | — |
 | 08 | _(회고 백필 예정)_ | — | — |
 
-초기 학습 기록은 Phase 단위로 분리되지 않은 채 누적되었기 때문에 Q&A는 [qna/cross-cutting.md](qna/cross-cutting.md)에 통합되어 있다. 이후 Phase 단위 분할이 필요하면 `qna/phaseNN.md`로 분리한다.
+초기 학습 기록은 Phase 단위로 나뉘지 않은 채 누적되었기 때문에 Q&A는 [qna/cross-cutting.md](qna/cross-cutting.md)에 통합되어 있다. 이후 Phase 단위 분할이 필요하면 `qna/phaseNN.md`로 분리한다.
 
 ---
 

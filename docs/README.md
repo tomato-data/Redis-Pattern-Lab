@@ -1,6 +1,6 @@
 # docs — Redis Pattern Lab
 
-> Claude가 제시한 Phase 스펙·가이드. 사용자 산출물(Q&A, 토픽 심화)은 `../learnings/`.
+> Claude가 제시한 Phase 스펙·가이드. 사용자 산출물(Q&A, 토픽 심화)은 `../learnings/`에 둔다.
 
 ## Phase 인덱스
 

@@ -2,40 +2,40 @@
 
 [![English](https://img.shields.io/badge/lang-English-blue)](README.en.md)
 
-> **12개 실무 Redis 패턴**을 FastAPI로 직접 구현 — 캐시부터 분산 락까지, 만들면서 배우기.
+> **12개 실무 Redis 패턴**을 FastAPI로 직접 구현하며, 캐시부터 분산 락까지 손으로 익힌 프로젝트.
 
-## Highlights
+## 하이라이트
 
 - **12개 실습 패턴** — 캐싱, 세션, 카운터, 분산 락, Rate Limiting, 랭킹, Pub/Sub, Stream까지
-- **AI 활용 구조적 학습** — Claude가 [Phase 스펙과 마스터 로드맵](docs/phases/)을 설계, 프로젝트 골격 구축, 내가 직접 [심화 주제와 Q&A](learnings/)를 작성
-- **한 줄로 실행** — `docker compose up`으로 Redis 7.2 + RedisInsight + FastAPI 즉시 구동
+- **AI를 활용한 구조화된 학습** — Claude가 [Phase 스펙과 마스터 로드맵](docs/phases/)을 설계하고 프로젝트 골격을 만들었고, 저는 [심화 주제와 Q&A](learnings/)를 직접 작성
+- **한 줄로 실행** — `docker compose up`으로 Redis 7.2 + RedisInsight + FastAPI 구동
 - **벤치마크 기반 인사이트** — 모든 패턴에 Redis vs SQLite 성능 비교 데이터 포함
 
 ---
 
 ## 왜 만들었나
 
-실무에서 Redis를 캐싱과 세션 관리에 도입해서 사용하고 있었지만, 이해가 피상적이라는 걸 깨달았습니다. `SET`과 `GET`을 호출하는 방법은 알지만, Redis가 왜 싱글 스레드 I/O 멀티플렉싱을 쓰는지, Sorted Set이 언제 SQL `ORDER BY`를 이기는지, 캐시 스탬피드를 어떻게 방지하는지는 몰랐습니다.
+업무에서 Redis를 캐싱과 세션 관리에 쓰고 있었지만, 이해는 피상적이라는 걸 깨달았습니다. `SET`과 `GET`을 호출하는 방법은 알았지만 Redis가 왜 싱글 스레드 I/O 멀티플렉싱을 쓰는지, Sorted Set이 언제 SQL `ORDER BY`보다 나은지, 캐시 스탬피드를 어떻게 방지하는지는 제대로 설명할 수 없었습니다.
 
-문서를 수동적으로 읽는 대신, Claude를 활용해 구조적인 커리큘럼을 설계하고, 각 패턴을 직접 구현하고 실행하고 관계형 DB와 비교하는 실습 환경을 구축했습니다.
+문서를 읽기만 하는 대신 Claude를 활용해 커리큘럼을 설계했고, 각 패턴을 직접 구현하고 실행한 뒤 관계형 DB와 비교하는 실습 환경을 만들었습니다.
 
 ---
 
 ## 학습 방식
 
 ```
-1. AI가 Phase 스펙 + 마스터 로드맵 생성 (docs/phases/)
+1. AI가 Phase 스펙과 마스터 로드맵 생성 (docs/phases/)
        ↓
-2. AI가 프로젝트 골격 + Docker 환경 구축
+2. AI가 프로젝트 골격과 Docker 환경 구축
        ↓
 3. 패턴별 직접 구현, 실행, 결과 관찰
        ↓
-4. 진행하며 Q&A와 심화 주제를 직접 기록 (learnings/)
+4. 진행 중 나온 Q&A와 심화 주제를 직접 기록 (learnings/)
        ↓
 5. 검토하고, 질문하고, 개념이 확실해질 때까지 반복
 ```
 
-> 코드는 내가 작성하고, AI는 튜터. Phase 스펙은 [`docs/phases/`](docs/phases/)에, Q&A와 심화 노트는 [`learnings/`](learnings/)에 있다.
+> 코드는 제가 작성하고, AI는 튜터로 사용했습니다. Phase 스펙은 [`docs/phases/`](docs/phases/)에, Q&A와 심화 노트는 [`learnings/`](learnings/)에 있습니다.
 
 ---
 
@@ -68,8 +68,8 @@
 | Pipeline vs 개별 | 0.724 ms | 6.109 ms | **8.4배** |
 | Top 10 랭킹 조회 | 0.164 ms | 1.094 ms | **6.7배** |
 
-> 쓰기에서 가장 큰 차이(27배) — SQLite는 UPDATE마다 디스크 커밋, Redis INCR은 메모리에서 완료.
-> 네트워크 없는 로컬 SQLite에서도 Redis가 일관되게 3~27배 빠름.
+> 쓰기에서 가장 큰 차이(27배)가 났습니다. SQLite는 UPDATE마다 디스크 커밋이 필요하지만, Redis INCR은 메모리에서 끝납니다.
+> 네트워크 비용이 없는 로컬 SQLite와 비교해도 Redis가 일관되게 3~27배 빨랐습니다.
 
 ---
 
@@ -135,7 +135,7 @@ Redis-Pattern-Lab/
 
 ## 학습 문서
 
-문서는 **작성 주체**에 따라 분리되어 있습니다. Phase 스펙은 [`docs/`](docs/README.md)(Claude 작성), Q&A·회고·크로스커팅 심화는 [`learnings/`](learnings/README.md)(사용자 작성)에 있습니다.
+문서는 **작성 주체**를 기준으로 나눴습니다. Phase 스펙은 [`docs/`](docs/README.md)(Claude 작성)에, Q&A·회고·크로스커팅 심화는 [`learnings/`](learnings/README.md)(사용자 작성)에 있습니다.
 
 | 문서 | 주제 |
 |------|------|
@@ -160,10 +160,10 @@ docker compose up -d
 # RedisInsight: http://localhost:5540
 ```
 
-각 스텝은 별도의 API 그룹 — Swagger UI에서 순서대로 실행 (Step 01 → 12).
+각 스텝은 별도의 API 그룹입니다. Swagger UI에서 Step 01부터 Step 12까지 순서대로 실행할 수 있습니다.
 
 ---
 
-## License
+## 라이선스
 
-This project is licensed under the [MIT License](LICENSE).
+이 프로젝트는 [MIT 라이선스](LICENSE)로 배포됩니다.
